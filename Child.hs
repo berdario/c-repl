@@ -1,4 +1,3 @@
--- c-repl: a C read-eval-print loop.
 -- Copyright (C) 2008 Evan Martin <martine@danga.com>
 
 -- This module is responsible for managing the child process that actually
@@ -17,7 +16,7 @@ module Child (
 
 import Prelude hiding (catch)
 import Control.Concurrent
-import Control.Exception
+import Control.OldException
 import Control.Monad.Error
 import Data.Maybe
 import System.Directory

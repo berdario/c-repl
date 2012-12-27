@@ -16,7 +16,7 @@ module GCCXML (
 
 import Prelude hiding (catch)
 import Control.Monad.Error
-import Control.Exception
+import Control.OldException
 import qualified Data.ByteString as BS
 import Data.Maybe (mapMaybe)
 import Data.List (intercalate)
@@ -120,7 +120,7 @@ symbols code = runErrorT $ do
   where
   parseSymbols :: XML -> Either String [Symbol]
   parseSymbols xml = do
-    tree <- case Expat.parseTree' Nothing xml of
+    tree <- case Expat.parse' (Expat.ParseOptions Nothing Nothing) xml of
               Left err -> throwError (show err)
               Right (Expat.Element root attrs tree) -> return tree
     let nodes = mapMaybe parseNode tree
