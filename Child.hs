@@ -1,3 +1,6 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 -- Copyright (C) 2008 Evan Martin <martine@danga.com>
 
 -- This module is responsible for managing the child process that actually
@@ -16,7 +19,7 @@ module Child (
 
 import Prelude hiding (catch)
 import Control.Concurrent
-import Control.OldException
+import Control.Exception
 import Control.Monad.Error
 import Data.Maybe
 import System.Directory
@@ -57,7 +60,7 @@ findChildBinary = do
     do
       perms <- getPermissions path
       return $ readable perms
-    `catch` \e -> return False
+    `catch` \ (e :: SomeException) -> return False
 
 -- Create a new Child, starting the helper process.
 start :: IO (Either String Child)
@@ -125,7 +128,7 @@ run child entry = runErrorT (sendCommand >> awaitResponse) where
               checkResponse respMVar (ms-100)
 
 isDead :: Child -> IO Bool
-isDead child = catchJust ioErrors getExited (\e -> return True) where
+isDead child = catch getExited (\ (e :: IOException) -> return True) where
   getExited = do
     exit <- getProcessExitCode (childPHandle child)
     return $ isJust exit

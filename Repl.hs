@@ -92,11 +92,11 @@ generateSharedObject env snippet = do
   let soname = creplDir </> "dl" ++ show (envEntry env) ++ ".so"
   let cmd = "gcc -Wall " ++ libs ++ "-xc -g -shared -fPIC -o " ++ soname ++ " -"
   (inp,out,err,pid) <- runInteractiveCommand cmd 
-  error <- hGetContents err
+  errorMsg <- hGetContents err
   hPutStr inp snippet
   hClose inp
   exit <- waitForProcess pid
-  when (not (null error)) $ putStr error
+  when (not (null errorMsg)) $ putStr errorMsg
   case exit of
     ExitSuccess -> return (return ())
     ExitFailure code -> return (throwError "compile failed.")

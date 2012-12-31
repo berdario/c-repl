@@ -1,3 +1,6 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 -- c-repl: a C read-eval-print loop.
 -- Copyright (C) 2008 Evan Martin <martine@danga.com>
 
@@ -16,7 +19,7 @@ module GCCXML (
 
 import Prelude hiding (catch)
 import Control.Monad.Error
-import Control.OldException
+import Control.Exception
 import qualified Data.ByteString as BS
 import Data.Maybe (mapMaybe)
 import Data.List (intercalate)
@@ -32,7 +35,7 @@ type XMLNode = Expat.Node String String
 -- @runGCCXML code@ runs a gccxml process on |code|, returning the XML output
 -- or an error string on error.
 runGCCXML :: String -> IO (Either String XML)
-runGCCXML code = run `catch` (\e -> do print e; undefined) where
+runGCCXML code = run `catch` (\ (e :: SomeException) -> do error $ "runGCCXMl: " ++ show e) where
   run = do
     let cmd = "gccxml - -fxml=/dev/stdout"
     (inp,out,err,pid) <- runInteractiveCommand cmd
